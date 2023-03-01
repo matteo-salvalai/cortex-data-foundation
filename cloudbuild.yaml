@@ -75,7 +75,7 @@ steps:
           cp config/config.env src/SAP/ROW_LEVEL_SECURITY/config/sap_config.env
           gcloud builds submit ./src/SAP/ROW_LEVEL_SECURITY \
           --config=./src/SAP/ROW_LEVEL_SECURITY/cloudbuild.rowlvlsec.yaml \
-          --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}'_DS_CDC_SEC='${_DS_CDC_SEC}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_LOCATION='${_LOCATION}'
+          --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}'_DS_CDC_SEC='${_DS_CDC_SEC}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
         fi
 
   - name: gcr.io/cloud-builders/gcloud
