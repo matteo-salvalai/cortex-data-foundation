@@ -1,9 +1,9 @@
 {
-    "testData": true,
+    "testData": false,
     "generateExtraData": true,
     "deployCDC": true,
     "deploySAP": true,
-    "deploySFDC": true,
+    "deploySFDC": false,
     "turboMode": true,
     "projectIdSource": "",
     "projectIdTarget": "",
@@ -13,7 +13,8 @@
         "S"
     ],
     "currencies": [
-        "USD"
+        "USD",
+        "EUR"
     ],
     "SAP": {
         "datasets": {
