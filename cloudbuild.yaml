@@ -64,8 +64,16 @@ steps:
         fi
 
   - name: gcr.io/cloud-builders/gcloud
-    id: 'sap-reporting'
+    id: 'sap-rowlevelsec'
     waitFor: ['sap-cdc']
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |
+
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'sap-reporting'
+    waitFor: ['sap-rowlevelsec']
     entrypoint: "bash"
     args:
       - "-c"
