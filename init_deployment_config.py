@@ -53,6 +53,8 @@ CFG_DEPLOY_CDC = ""
 CFG_PJID_SRC = ""
 CFG_PJID_TGT = ""
 CFG_SAP_DS_CDC = ""
+CFG_SAP_DS_CDC_RT = ""
+CFG_SAP_DS_CDC_SEC = ""
 CFG_SAP_DS_RAW = ""
 CFG_SAP_DS_CDC_ECC = ""
 CFG_SAP_DS_CDC_S4 = ""
@@ -181,6 +183,8 @@ def main():
     CFG_PJID_SRC = cfg["projectIdSource"]
     CFG_PJID_TGT = cfg["projectIdTarget"]
     CFG_SAP_DS_CDC = cfg["SAP"]["datasets"]["cdc"]
+    CFG_SAP_DS_CDC_RT = cfg["SAP"]["datasets"]["cdcRT"]
+    CFG_SAP_DS_CDC_SEC = cfg["SAP"]["datasets"]["cdcSec"]
     CFG_SAP_DS_RAW = cfg["SAP"]["datasets"]["raw"]
     CFG_SAP_DS_CDC_ECC = cfg["SAP"]["datasets"]["cdcECC"]
     CFG_SAP_DS_CDC_S4 = cfg["SAP"]["datasets"]["cdcS4"]
@@ -207,6 +211,12 @@ def main():
                         required=False)
     parser.add_argument("--DS_CDC",
                         help="SAP CDC Dataset Name.",
+                        required=False)
+    parser.add_argument("--DS_CDC_RT",
+                        help="SAP RT CDC Dataset Name.",
+                        required=False)
+    parser.add_argument("--DS_CDC_SEC",
+                        help="SAP CDC Secure Dataset Name.",
                         required=False)
     parser.add_argument("--DS_RAW",
                         help="SAP Raw Landing Dataset Name.",
@@ -253,6 +263,8 @@ def main():
         # If no target project is provided, assume same as source
         "PJID_TGT": [args.PJID_TGT, CFG_PJID_TGT, args.PJID_SRC, CFG_PJID_SRC],
         "DS_CDC": [args.DS_CDC, CFG_SAP_DS_CDC],
+        "DS_CDC_RT": [args.DS_CDC_RT, CFG_SAP_DS_CDC_RT],
+        "DS_CDC_SEC": [args.DS_CDC_SEC, CFG_SAP_DS_CDC_SEC],
         "DS_RAW": [args.DS_RAW, CFG_SAP_DS_RAW],
         "DS_REPORTING": [args.DS_REPORTING, CFG_SAP_DS_REPORTING, "REPORTING"],
         "DS_MODELS": [args.DS_MODELS, CFG_SAP_DS_MODELS, "ML_MODELS"],

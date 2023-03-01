@@ -22,6 +22,7 @@ steps:
       - "-c"
       - |-
          ./validate_deploy_config.sh --source-project '${_PJID_SRC}' --target-project '${_PJID_TGT}' --cdc-processed-dataset '${_DS_CDC}'  \
+           --cdc-rt-processed-dataset '${_DS_CDC_RT}' --cdc-processed-sec-dataset '${_DS_CDC_SEC}' \
            --raw-landing-dataset '${_DS_RAW}' --reporting-dataset '${_DS_REPORTING}' --models-dataset '${_DS_MODELS}' --location '${_LOCATION}'  \
            --mandt '${_MANDT}' --sql-flavour '${_SQL_FLAVOUR}' --test-data '${_TEST_DATA}' --gen-ext '${_GEN_EXT}'  \
            --deploy-sap '${_DEPLOY_SAP}' --deploy-sfdc '${_DEPLOY_SFDC}'
@@ -60,7 +61,7 @@ steps:
           cp config/config.env src/SAP/SAP_CDC/config/sap_config.env
           gcloud builds submit ./src/SAP/SAP_CDC  \
           --config=./src/SAP/SAP_CDC/cloudbuild.cdc.yaml \
-          --substitutions=_PJID_SRC='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_TEST_DATA='${_TEST_DATA}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_GEN_EXT='${_GEN_EXT}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
+          --substitutions=_PJID_SRC='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}',_DS_CDC_RT='${_DS_CDC_RT}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_TEST_DATA='${_TEST_DATA}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_GEN_EXT='${_GEN_EXT}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
         fi
 
   - name: gcr.io/cloud-builders/gcloud
@@ -70,6 +71,12 @@ steps:
     args:
       - "-c"
       - |
+        if [ '$_DEPLOY_SAP' = 'true']; then
+          cp config/config.env src/SAP/ROW_LEVEL_SECURITY/config/sap_config.env
+          gcloud builds submit ./src/SAP/ROW_LEVEL_SECURITY \
+          --config=./src/SAP/ROW_LEVEL_SECURITY/cloudbuild.rowlvlsec.yaml \
+          --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}'_DS_CDC_SEC='${_DS_CDC_SEC}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_LOCATION='${_LOCATION}'
+        fi
 
   - name: gcr.io/cloud-builders/gcloud
     id: 'sap-reporting'
@@ -82,22 +89,8 @@ steps:
           cp config/config.env src/SAP/SAP_REPORTING/sap_config.env
           gcloud builds submit ./src/SAP/SAP_REPORTING  \
           --config=./src/SAP/SAP_REPORTING/cloudbuild.reporting.yaml \
-          --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_TGT}',_DS_RAW='${_DS_RAW}',_DS_CDC='${_DS_CDC}',_DS_REPORTING='${_DS_REPORTING}',_DS_MODELS='${_DS_MODELS}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_LOCATION=$$_LOCATION_,_MANDT='${_MANDT}',_GCS_BUCKET='${_GCS_BUCKET}'
+          --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_TGT}',_DS_RAW='${_DS_RAW}',_DS_CDC='${_DS_CDC_SEC}',_DS_REPORTING='${_DS_REPORTING}',_DS_MODELS='${_DS_MODELS}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_LOCATION=$$_LOCATION_,_MANDT='${_MANDT}',_GCS_BUCKET='${_GCS_BUCKET}'
         fi
-# TODO: sap-rowlvlsec
-#  - name: gcr.io/cloud-builders/gcloud
-#    id: 'sap-ml-models'
-#    waitFor: ['sap-reporting']
-#    entrypoint: "bash"
-#    args:
-#      - "-c"
-#      - |-
-#        if [ '$_DEPLOY_SAP' = "true" ]; then
-#          source load_env_from_config.sh
-#          gcloud builds submit ./src/SAP/SAP_ML_MODELS  \
-#          --config=./src/SAP/SAP_ML_MODELS/cloudbuild.models.yaml \
-#          --substitutions=_PJID_SRC=$$_PJID_SRC_,_PJID_TGT=$$_PJID_TGT_,_DS_RAW=$$_DS_RAW_,_DS_CDC=$$_DS_CDC_,_DS_REPORTING=$$_DS_REPORTING_,_DS_MODELS=$$_DS_MODELS_,_SQL_FLAVOUR=$$_SQL_FLAVOUR_,_LOCATION=$$_LOCATION_,_MANDT=$$_MANDT_,_GCS_BUCKET='${_GCS_BUCKET}'
-#        fi
 
 #  - name: gcr.io/cloud-builders/gcloud
 #    id: 'sfdc-deploy'
@@ -116,7 +109,7 @@ steps:
 logsBucket: "gs://$_GCS_BUCKET"
 timeout: 10200s
 substitutions:
-  _TEST_DATA: "true"
+  _TEST_DATA: "false"
   _DEPLOY_CDC: "true"
   _DEPLOY_SAP: "true"
   _DEPLOY_SFDC: "false"

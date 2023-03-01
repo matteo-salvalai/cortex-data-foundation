@@ -1,9 +1,9 @@
 {
-    "testData": true,
+    "testData": false,
     "generateExtraData": true,
     "deployCDC": true,
     "deploySAP": true,
-    "deploySFDC": true,
+    "deploySFDC": false,
     "turboMode": true,
     "projectIdSource": "",
     "projectIdTarget": "",
@@ -17,6 +17,8 @@
     "SAP": {
         "datasets": {
             "cdc": "",
+            "cdcRT": "",
+            "cdcSec": "",
             "raw": "",
             "ml": "ML_MODELS",
             "reporting": "REPORTING",

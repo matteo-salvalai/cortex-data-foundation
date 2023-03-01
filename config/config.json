@@ -19,6 +19,8 @@
     "SAP": {
         "datasets": {
             "cdc": "",
+            "cdcRT": "",
+            "cdcSec": "",
             "raw": "",
             "ml": "ML_MODELS",
             "reporting": "REPORTING",

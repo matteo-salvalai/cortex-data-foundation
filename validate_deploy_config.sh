@@ -32,7 +32,9 @@ readonly CONFIG_FILE="./config/config.json"
 source_project=""
 target_project=""
 cdc_processed_dataset=""
+cdc_rt_processed_dataset=""
 raw_landing_dataset=""
+cdc_processed_sec_dataset=""
 reporting_dataset=""
 models_dataset=""
 location=""
@@ -61,6 +63,8 @@ Options
 -s | source-project             : Source Dataset Project ID. Mandatory
 -t | target-project             : Target Dataset Project ID. Mandatory
 -c | cdc-processed-dataset      : Source Dataset Name. Mandatory
+-k | cdc-processed-sec-dataset  : Source Dataset with Row Level Security Name 
+-q | cdc-rt-processed-dataset   : Source RT Dataset Name
 -r | raw-landing-dataset        : Raw Landing Dataset Name. (Default: cdc-processed-dataset)
 -p | reporting-dataset          : Target Dataset Name for Reporting (Default: REPORTING)
 -a | models-dataset             : Target Dataset Name for ML (Default: MODELS)
@@ -96,6 +100,8 @@ validate_builds_parameters() {
   target_project = ${target_project}
   cdc_processed_dataset = ${cdc_processed_dataset}
   raw_landing_dataset = ${raw_landing_dataset}
+  cdc_rt_processed_dataset = ${cdc_rt_processed_dataset}
+  cdc_processed_sec_dataset = ${cdc_processed_sec_dataset}
   reporting_dataset = ${reporting_dataset}
   models_dataset = ${models_dataset}
   location = ${location}
@@ -115,6 +121,8 @@ EOF
     --PJID_TGT="${target_project}" \
     --DS_CDC="${cdc_processed_dataset}" \
     --DS_RAW="${raw_landing_dataset}" \
+    --DS_CDC_RT="${cdc_rt_processed_dataset}" \
+    --DS_CDC_SEC="${cdc_processed_sec_dataset}" \
     --DS_REPORTING="${reporting_dataset}" \
     --DS_MODELS="${models_dataset}" \
     --LOCATION="${location}" \
@@ -131,7 +139,7 @@ EOF
 #--------------------
 
 set -o errexit -o noclobber -o nounset -o pipefail
-opts="$(getopt -o hs:t:c:r:p:a:l:m:f:d:e:g:b:i:j: -l help,source-project:,target-project:,cdc-processed-dataset:,raw-landing-dataset:,reporting-dataset:,models-dataset:,location:,mandt:,sql-flavour:,test-data:,gen-ext:,deploy-sap:,deploy-sfdc: --name "$0" -- "$@")"
+opts="$(getopt -o hs:t:c:r:p:a:l:m:f:d:e:g:b:i:j:k:q: -l help,source-project:,target-project:,cdc-processed-dataset:,raw-landing-dataset:,reporting-dataset:,models-dataset:,location:,mandt:,sql-flavour:,test-data:,gen-ext:,deploy-sap:,deploy-sfdc:,cdc-processed-sec-dataset:,cdc-rt-processed-dataset: --name "$0" -- "$@")"
 
 eval set -- "$opts"
 
@@ -192,6 +200,14 @@ while true; do
       ;;
     -j | --deploy-sfdc)
       deploy_sfdc=$2
+      shift 2
+      ;;
+    -k | --cdc-processed-sec-dataset)
+      cdc_processed_sec_dataset=$2
+      shift 2
+      ;;
+    -q | --cdc-rt-processed-dataset)
+      cdc_rt_processed_dataset=$2
       shift 2
       ;;
     --)

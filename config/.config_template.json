@@ -13,6 +13,8 @@
     "SAP": {
         "datasets": {
             "cdc": "DS_CDC",
+            "cdcRT": "DS_CDC_RT",
+            "cdcSec": "DS_CDC_SEC",
             "raw": "DS_RAW",
             "ml": "DS_MODELS",
             "reporting": "DS_REPORTING",
