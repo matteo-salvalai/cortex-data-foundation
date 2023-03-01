@@ -9,8 +9,12 @@
 [submodule "src/SAP/SAP_CDC"]
 	path = src/SAP/SAP_CDC
 	url = ../cortex-cdc-processor
-	branch = dev
+	branch = main
 #[submodule "src/SFDC"]
 #	path = src/SFDC
 #	url = ../cortex-salesforce
 #	branch = main
+[submodule "src/SAP/ROW_LEVEL_SECURITY"]
+	path = src/SAP/ROW_LEVEL_SECURITY
+	url = ../cortex-row-level-security
+	branch = main
