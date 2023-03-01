@@ -9,7 +9,7 @@
 [submodule "src/SAP/SAP_CDC"]
 	path = src/SAP/SAP_CDC
 	url = ../cortex-cdc-processor
-	branch = main
+	branch = dev
 #[submodule "src/SFDC"]
 #	path = src/SFDC
 #	url = ../cortex-salesforce
