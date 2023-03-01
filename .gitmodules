@@ -1,16 +1,16 @@
 [submodule "src/SAP/SAP_REPORTING"]
 	path = src/SAP/SAP_REPORTING
-	url = ../cortex-reporting
+	url = https://github.com/GoogleCloudPlatform/cortex-reporting
 	branch = main
-[submodule "src/SAP/SAP_ML_MODELS"]
-	path = src/SAP/SAP_ML_MODELS
-	url = ../cortex-ml-models
-	branch = main
+#[submodule "src/SAP/SAP_ML_MODELS"]
+#	path = src/SAP/SAP_ML_MODELS
+#	url = ../cortex-ml-models
+#	branch = main
 [submodule "src/SAP/SAP_CDC"]
 	path = src/SAP/SAP_CDC
-	url = ../cortex-dag-generator
+	url = ../cortex-cdc-processor
 	branch = main
-[submodule "src/SFDC"]
-	path = src/SFDC
-	url = ../cortex-salesforce
-	branch = main
+#[submodule "src/SFDC"]
+#	path = src/SFDC
+#	url = ../cortex-salesforce
+#	branch = main
