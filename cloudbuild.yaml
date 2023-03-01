@@ -79,7 +79,21 @@ steps:
         fi
 
   - name: gcr.io/cloud-builders/gcloud
-    id: 'sap-reporting'
+    id: 'sap-reporting-source-prj'
+    waitFor: ['sap-rowlevelsec']
+    entrypoint: "bash"
+    args:
+      - "-c"
+      - |-
+        if [ '$_DEPLOY_SAP' = "true" ]; then
+          cp config/config.env src/SAP/SAP_REPORTING/sap_config.env
+          gcloud builds submit ./src/SAP/SAP_REPORTING  \
+          --config=./src/SAP/SAP_REPORTING/cloudbuild.reporting.yaml \
+          --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_DS_CDC='${_DS_CDC_SEC}',_DS_REPORTING='${_DS_REPORTING}',_DS_MODELS='${_DS_MODELS}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_LOCATION=$$_LOCATION_,_MANDT='${_MANDT}',_GCS_BUCKET='${_GCS_BUCKET}'
+        fi
+
+  - name: gcr.io/cloud-builders/gcloud
+    id: 'sap-reporting-target-prj'
     waitFor: ['sap-rowlevelsec']
     entrypoint: "bash"
     args:
