@@ -51,7 +51,7 @@ steps:
 #          ./create_test_harness.sh $$_PJID_SRC_ $$_DS_RAW_SFDC_ "sfdc" $$_LOCATION_
 #        fi
 
-  - name: gcr.io/cloud-builders/gcloud-slim
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-cdc'
     waitFor: ['sap-test-harness']
     entrypoint: /bin/bash
@@ -65,7 +65,7 @@ steps:
           --substitutions=_PJID_SRC='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}',_DS_CDC_RT='${_DS_CDC_RT}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_TEST_DATA='${_TEST_DATA}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_GEN_EXT='${_GEN_EXT}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
         fi
 
-  - name: gcr.io/cloud-builders/gcloud-slim
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-rowlevelsec'
     waitFor: ['sap-cdc']
     entrypoint: "bash"
@@ -79,7 +79,7 @@ steps:
           --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}'_DS_CDC_SEC='${_DS_CDC_SEC}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
         fi
 
-  - name: gcr.io/cloud-builders/gcloud-slim
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-reporting-source-prj'
     waitFor: ['sap-rowlevelsec']
     entrypoint: "bash"
@@ -94,7 +94,7 @@ steps:
         fi
 
 #  - name: gcr.io/cloud-builders/gcloud
-  - name: gcr.io/cloud-builders/gcloud-slim
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-reporting-target-prj'
     waitFor: ['sap-rowlevelsec']
     entrypoint: "bash"
