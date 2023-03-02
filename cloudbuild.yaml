@@ -27,6 +27,7 @@ steps:
            --mandt '${_MANDT}' --sql-flavour '${_SQL_FLAVOUR}' --test-data '${_TEST_DATA}' --gen-ext '${_GEN_EXT}'  \
            --deploy-sap '${_DEPLOY_SAP}' --deploy-sfdc '${_DEPLOY_SFDC}'
 
+  # TODO: step to import parquet files from DI
   - name: gcr.io/kittycorn-public/deploy-kittycorn:v2.0
     entrypoint: "bash"
     id: 'sap-test-harness'
@@ -50,7 +51,7 @@ steps:
 #          ./create_test_harness.sh $$_PJID_SRC_ $$_DS_RAW_SFDC_ "sfdc" $$_LOCATION_
 #        fi
 
-  - name: gcr.io/cloud-builders/gcloud
+  - name: gcr.io/cloud-builders/gcloud-slim
     id: 'sap-cdc'
     waitFor: ['sap-test-harness']
     entrypoint: /bin/bash
@@ -64,7 +65,7 @@ steps:
           --substitutions=_PJID_SRC='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}',_DS_CDC_RT='${_DS_CDC_RT}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_TEST_DATA='${_TEST_DATA}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_GEN_EXT='${_GEN_EXT}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
         fi
 
-  - name: gcr.io/cloud-builders/gcloud
+  - name: gcr.io/cloud-builders/gcloud-slim
     id: 'sap-rowlevelsec'
     waitFor: ['sap-cdc']
     entrypoint: "bash"
@@ -78,7 +79,7 @@ steps:
           --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_CDC='${_DS_CDC}'_DS_CDC_SEC='${_DS_CDC_SEC}',_GCS_BUCKET='${_TGT_BUCKET}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_LOCATION='${_LOCATION}',_DEPLOY_CDC='${_DEPLOY_CDC}'
         fi
 
-  - name: gcr.io/cloud-builders/gcloud
+  - name: gcr.io/cloud-builders/gcloud-slim
     id: 'sap-reporting-source-prj'
     waitFor: ['sap-rowlevelsec']
     entrypoint: "bash"
@@ -92,7 +93,8 @@ steps:
           --substitutions=_PJID_SRC='${_PJID_SRC}',_PJID_TGT='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_DS_CDC='${_DS_CDC_SEC}',_DS_REPORTING='${_DS_REPORTING}',_DS_MODELS='${_DS_MODELS}',_SQL_FLAVOUR='${_SQL_FLAVOUR}',_LOCATION=$$_LOCATION_,_MANDT='${_MANDT}',_GCS_BUCKET='${_GCS_BUCKET}'
         fi
 
-  - name: gcr.io/cloud-builders/gcloud
+#  - name: gcr.io/cloud-builders/gcloud
+  - name: gcr.io/cloud-builders/gcloud-slim
     id: 'sap-reporting-target-prj'
     waitFor: ['sap-rowlevelsec']
     entrypoint: "bash"
