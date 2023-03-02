@@ -1,0 +1,17 @@
+steps:
+  - name: gcr.io/kittycorn-public/deploy-kittycorn-cdc:v1.5
+    entrypoint: /bin/bash
+    id: 'import-di-data'
+    waitFor: ['-']
+    args:
+      - '-c'
+      - |
+        if [ ! -z '_DI_BUCKET' ] ; then
+          source load_env_from_config.sh
+          cd ./src/ && python load_tables.py $$_DI_BUCKET_ $$_PJID_SRC_ $$_DS_RAW_ $$_LOCATION_
+        fi
+
+logsBucket: "gs://$_GCS_BUCKET/logs"
+timeout: 7200s
+options:
+  substitution_option: "ALLOW_LOOSE"

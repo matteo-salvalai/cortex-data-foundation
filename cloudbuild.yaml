@@ -25,9 +25,8 @@ steps:
            --cdc-rt-processed-dataset '${_DS_CDC_RT}' --cdc-processed-sec-dataset '${_DS_CDC_SEC}' \
            --raw-landing-dataset '${_DS_RAW}' --reporting-dataset '${_DS_REPORTING}' --models-dataset '${_DS_MODELS}' --location '${_LOCATION}'  \
            --mandt '${_MANDT}' --sql-flavour '${_SQL_FLAVOUR}' --test-data '${_TEST_DATA}' --gen-ext '${_GEN_EXT}'  \
-           --deploy-sap '${_DEPLOY_SAP}' --deploy-sfdc '${_DEPLOY_SFDC}' --di-bucket '${_DI_BUCKET_}'
+           --deploy-sap '${_DEPLOY_SAP}' --deploy-sfdc '${_DEPLOY_SFDC}' --di-bucket '${_DI_BUCKET}'
 
-  # TODO: import parquet files from DI
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     entrypoint: bash
     id: 'import-di-data'
@@ -35,33 +34,12 @@ steps:
     args:
       - '-c'
       - |
-        if [ '$_TEST_DATA' = "true" ] && [ '$_DEPLOY_SAP' = "true" ]; then
-          source load_env_from_config.sh
-          ./load_parquet.sh $$_DI_BUCKET_ $$_PJID_SRC_ $$_DS_RAW_ $$_LOCATION_
+        if [ ! -z '$_DI_BUCKET' ] ; then
+          cp config/config.env src/DI/LOAD_EXT_TABLES/config/config.env
+          gcloud builds submit ./src/DI/LOAD_EXT_TABLES  \
+          --config=./src/DI/LOAD_EXT_TABLES/cloudbuild.extTab.yaml \
+          --substitutions=_DI_BUCKET='${_DI_BUCKET}',_PJID_SRC='${_PJID_SRC}',_DS_RAW='${_DS_RAW}',_GCS_LOG_BUCKET='${_GCS_BUCKET}',_LOCATION='${_LOCATION}'
         fi
-
-#  - name: gcr.io/kittycorn-public/deploy-kittycorn:v2.0
-#    entrypoint: "bash"
-#    id: 'sap-test-harness'
-#    waitFor: ['validate_deploy_config']
-#    args:
-#      - "-c"
-#      - |
-#        if [ '$_TEST_DATA' = "true" ] && [ '$_DEPLOY_SAP' = "true" ]; then
-#          source load_env_from_config.sh
-#          ./create_test_harness.sh $$_PJID_SRC_ $$_DS_RAW_ $$_SQL_FLAVOUR_ $$_LOCATION_
-#        fi
-#  - name: gcr.io/kittycorn-public/deploy-kittycorn:v2.0
-#    entrypoint: "bash"
-#    id: 'sfdc-test-harness'
-#    waitFor: ['validate_deploy_config']
-#    args:
-#      - "-c"
-#      - |
-#        if [ '$_TEST_DATA' = "true" ] && [ '$_DEPLOY_SFDC' = "true" ]; then
-#          source load_env_from_config.sh
-#          ./create_test_harness.sh $$_PJID_SRC_ $$_DS_RAW_SFDC_ "sfdc" $$_LOCATION_
-#        fi
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-cdc'
@@ -80,7 +58,7 @@ steps:
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-rowlevelsec'
     waitFor: ['sap-cdc']
-    entrypoint: "bash"
+    entrypoint: /bin/bash
     args:
       - "-c"
       - |
