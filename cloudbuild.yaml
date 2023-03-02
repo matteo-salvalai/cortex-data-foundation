@@ -25,20 +25,32 @@ steps:
            --cdc-rt-processed-dataset '${_DS_CDC_RT}' --cdc-processed-sec-dataset '${_DS_CDC_SEC}' \
            --raw-landing-dataset '${_DS_RAW}' --reporting-dataset '${_DS_REPORTING}' --models-dataset '${_DS_MODELS}' --location '${_LOCATION}'  \
            --mandt '${_MANDT}' --sql-flavour '${_SQL_FLAVOUR}' --test-data '${_TEST_DATA}' --gen-ext '${_GEN_EXT}'  \
-           --deploy-sap '${_DEPLOY_SAP}' --deploy-sfdc '${_DEPLOY_SFDC}'
+           --deploy-sap '${_DEPLOY_SAP}' --deploy-sfdc '${_DEPLOY_SFDC}' --di-bucket '${_DI_BUCKET_}'
 
-  # TODO: step to import parquet files from DI
-  - name: gcr.io/kittycorn-public/deploy-kittycorn:v2.0
-    entrypoint: "bash"
-    id: 'sap-test-harness'
+  # TODO: import parquet files from DI
+  - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
+    entrypoint: bash
+    id: 'import-di-data'
     waitFor: ['validate_deploy_config']
     args:
-      - "-c"
+      - '-c'
       - |
         if [ '$_TEST_DATA' = "true" ] && [ '$_DEPLOY_SAP' = "true" ]; then
           source load_env_from_config.sh
-          ./create_test_harness.sh $$_PJID_SRC_ $$_DS_RAW_ $$_SQL_FLAVOUR_ $$_LOCATION_
+          ./load_parquet.sh $$_DI_BUCKET_ $$_PJID_SRC_ $$_DS_RAW_ $$_LOCATION_
         fi
+
+#  - name: gcr.io/kittycorn-public/deploy-kittycorn:v2.0
+#    entrypoint: "bash"
+#    id: 'sap-test-harness'
+#    waitFor: ['validate_deploy_config']
+#    args:
+#      - "-c"
+#      - |
+#        if [ '$_TEST_DATA' = "true" ] && [ '$_DEPLOY_SAP' = "true" ]; then
+#          source load_env_from_config.sh
+#          ./create_test_harness.sh $$_PJID_SRC_ $$_DS_RAW_ $$_SQL_FLAVOUR_ $$_LOCATION_
+#        fi
 #  - name: gcr.io/kittycorn-public/deploy-kittycorn:v2.0
 #    entrypoint: "bash"
 #    id: 'sfdc-test-harness'
@@ -53,7 +65,7 @@ steps:
 
   - name: gcr.io/google.com/cloudsdktool/cloud-sdk:slim
     id: 'sap-cdc'
-    waitFor: ['sap-test-harness']
+    waitFor: ['import-di-data']
     entrypoint: /bin/bash
     args:
       - "-c"
