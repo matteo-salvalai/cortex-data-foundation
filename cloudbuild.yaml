@@ -122,7 +122,7 @@ steps:
 #          --substitutions=_TEST_DATA='${_TEST_DATA}',_DEPLOY_CDC='${_DEPLOY_CDC}',_GCS_LOGS_BUCKET='${_GCS_BUCKET}',_TGT_BUCKET='${_TGT_BUCKET}',_LOCATION='${_LOCATION}'
 #        fi
 
-logsBucket: "gs://$_GCS_BUCKET"
+logsBucket: "gs://$_GCS_BUCKET/logs"
 timeout: 10200s
 substitutions:
   _TEST_DATA: "false"
